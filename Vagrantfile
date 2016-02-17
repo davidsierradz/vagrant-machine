@@ -64,32 +64,60 @@ Vagrant.configure(2) do |config|
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
-  # config.vm.provision "shell", inline: <<-SHELL
-  #   sudo apt-get update
-  #   sudo apt-get install -y apache2
-  # SHELL
+  config.vm.provision "shell", inline: <<-SHELL
+  apt-get update
+  apt-get install -y apache2
+  apt-get install -y php5 libapache2-mod-php5 php5-mcrypt
+  SHELL
 
   ############################################################
   # Oh My ZSH Install section
 
   # Install git and zsh prerequisites 
-  #config.vm.provision :shell, inline: "apt-get update"
-  #config.vm.provision :shell, inline: "apt-get -y install git"
-  #config.vm.provision :shell, inline: "apt-get -y install zsh"
+  config.vm.provision :shell, 
+  inline: "apt-get -y install git"
+  config.vm.provision :shell, 
+  inline: "apt-get -y install zsh"
 
   # Clone Oh My Zsh from the git repo
-  #config.vm.provision :shell, privileged: false,
-  #  inline: "git clone git://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh"
-
+  config.vm.provision :shell, privileged: false,
+  inline: "git clone git://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh"
+  
   # Copy in the default .zshrc config file
-  #config.vm.provision :shell, privileged: false,
-  #  inline: "cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc"
-
+  config.vm.provision :shell, privileged: false,
+  inline: "git clone https://github.com/davidsierradz/dotfiles.git"
+  config.vm.provision "shell", privileged: false,
+  inline: "cd ~/dotfiles && git checkout vagrant"
+  config.vm.provision :shell, privileged: false,
+  inline: "cp ~/dotfiles/zsh/.zshrc ~/.zshrc"
   # Change the vagrant user's shell to use zsh
-  #config.vm.provision :shell, inline: "chsh -s /bin/zsh vagrant"
+  config.vm.provision :shell,
+  inline: "chsh -s /bin/zsh vagrant"
 
   ############################################################
 
-config.vm.network "private_network", ip: "192.168.10.192"
-config.vm.network "forwarded_port", guest: 80, host: 1234
+############################################################
+  # Vim Install section
+
+  # Install git and zsh prerequisites   
+  config.vm.provision :shell, 
+  inline: "apt-get -y install vim"
+  config.vm.provision :shell, privileged: false,
+  inline: "mkdir -p .vim"
+  config.vm.provision :shell, privileged: false,
+  inline: "mkdir -p .vim/bundle"
+  config.vm.provision :shell, privileged: false,
+  inline: "git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim"
+  config.vm.provision :shell, privileged: false,
+  inline: "cp ~/dotfiles/vim/.vimrc ~/.vimrc"
+  
+  # Instalar los plugines de Vim, no he encontrado la forma de que
+  # la provision de Vagrant lo ejecute sin errores.
+  #config.vm.provision :shell, privileged: false,
+  #inline: "ex +PluginInstall || :"
+
+  ############################################################
+
+  config.vm.network "private_network", ip: "192.168.10.192"
+  config.vm.network "forwarded_port", guest: 80, host: 1234
 end
